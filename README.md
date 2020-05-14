@@ -1,68 +1,106 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Implementing Context API in REACT APP 
 
-## Available Scripts
+It is a normal todo list  implemented using context api.
 
-In the project directory, you can run:
+Context API is mainly used in small scale application to maintain global state rather than redux.
 
-### `npm start`
+So, In this app context api is implemented in Redux way. So, It splits up the code and make it look better, allows developer to understand easily.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Create Context
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+``` render-babel
+import { createContext } from "react";
 
-### `npm test`
+export const TodoContext = createContext();
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
 
-### `npm run build`
+this above code creates you a context.
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Add UseReducer
+``` render-babel
+import React, { useReducer } from "react";
+import { initalState } from "../store/todo";
+import { todoReducer } from "../Reducer/todo";
+import { TodoContext } from './todoContext'
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+const Todo = props => {
+  const [state, dispatch] = useReducer(todoReducer, initalState);
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  return (
+    <TodoContext.Provider value={{ state, dispatch }}>
+      {props.children}
+    </TodoContext.Provider>
+  );
+};
 
-### `npm run eject`
+export default Todo;
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+pass a reducer and inital state to useReducer and pass the value to context provider so that you can use state and method where every you wrapped the context
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Create Store
+``` render-babel
+export const initalState = {
+    todos: ['setup webpack', 'create a base ', 'implementing design']
+};
+```
 
-## Learn More
+## Implement Reducer
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+``` render-babel
+export const todoReducer = (state, action) => {
+    switch(action.type) {
+        case 'ADD_TODO': 
+            return {
+                ...state,
+                todos: [...state.todos, action.payload]
+            }
+        case 'DELETE_TODO': 
+            return {
+                ...state,
+                todos: state.todos.filter((todo, index) => index !== action.payload)
+            }
+        default: 
+            return state
+    }
+} 
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
 
-### Code Splitting
+So you can create reducer by above.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+## Wrapping parent component with context provider
 
-### Analyzing the Bundle Size
+``` render-babel
+<TodoContextProvider>
+    <App />
+</TodoContextProvider>
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+you must wrap the needed parent component with the specific context provider.
 
-### Making a Progressive Web App
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+## using context and dispatch
 
-### Advanced Configuration
+``` render-babel
+import React, { useState, useContext } from 'react';
+import { TodoContext } from './context/todoContext';
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+const { state, dispatch } = useContext(TodoContext);
 
-### Deployment
+const onClickHandler = () => {
+    dispatch({type: 'ADD_TODO', payload: todo})
+    setTodo('');
+  }
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+you can import the created context and distruct both the value(state and dispatch) from it.
 
-### `npm run build` fails to minify
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+## Welcome
+
+Thank you for checking out!. Suggestion and request are always welcome. 

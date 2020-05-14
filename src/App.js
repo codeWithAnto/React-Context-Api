@@ -1,26 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useContext } from 'react';
+import Date from './components/Date';
+import { TodoContext } from './context/todoContext'
+import { Inputfield } from './components/Inputfield'
+import { AddButton } from './components/AddButton'
+import { TodoList } from './components/TodoList'
+import './App.css'
 
-function App() {
+const App = props => {
+  // Wrap the screen that need value from context  
+  const { dispatch } = useContext(TodoContext)
+  const [todo, setTodo] = useState('');
+
+  const onBlurHandler = todo => setTodo(todo);
+  const onClickHandler = () => {
+    dispatch({type: 'ADD_TODO', payload: todo})
+    setTodo('');
+  }
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <Date />
+      <Inputfield type="text" placeholder="Enter things todo" onBlurHandler={onBlurHandler} value={todo}/>
+      <AddButton text="Add Todo +" onClickHandler={onClickHandler}/>
+      <TodoList />
     </div>
-  );
+  )
 }
 
 export default App;
